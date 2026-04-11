@@ -1,0 +1,58 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getRoom, joinRoom, setPhase, updateRoom } from "@/lib/roomStore";
+
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const room = getRoom(id);
+    if (!room) {
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    }
+    return NextResponse.json(room);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const { action, playerName } = await req.json();
+
+    if (action === "join") {
+      const room = joinRoom(id, playerName);
+      if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
+      return NextResponse.json({ success: true, room });
+    }
+
+    if (action === "start") {
+      const room = setPhase(id, "playing");
+      if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
+      return NextResponse.json({ success: true, room });
+    }
+
+    if (action === "next_round") {
+      const current = getRoom(id);
+      if (!current) return NextResponse.json({ error: "Room not found" }, { status: 404 });
+      const nextRound = current.current_round + 1;
+      if (nextRound >= current.total_rounds) {
+        const room = setPhase(id, "results");
+        return NextResponse.json({ success: true, room });
+      }
+      const room = updateRoom(id, { current_round: nextRound, phase: "playing" });
+      return NextResponse.json({ success: true, room });
+    }
+
+    return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
