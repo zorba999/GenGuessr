@@ -1,3 +1,6 @@
+# runtime room persistence
+.rooms.json
+
 # dependencies
 /node_modules
 /.pnp
