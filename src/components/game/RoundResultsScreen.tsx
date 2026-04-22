@@ -60,17 +60,17 @@ export default function RoundResultsScreen({
                 {results.actual.language}
               </div>
             </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center">
-              <div className="text-xs text-slate-500 mb-1">Year</div>
-              <div className="text-lg font-black text-neon-purple">
-                {results.actual.year}
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Player Results */}
+        {sortedResults.length === 0 && (
+          <div className="glass rounded-xl p-5 text-center border border-slate-800 mb-4">
+            <div className="text-2xl mb-2 animate-spin-slow">⚡</div>
+            <div className="text-neon-green font-mono text-sm font-bold mb-1">AI Validators Scoring...</div>
+            <div className="text-slate-500 text-xs">GenLayer Optimistic Democracy consensus in progress</div>
+          </div>
+        )}
         <div className="space-y-3 mb-6">
           {sortedResults.map((r, idx) => (
             <div
@@ -100,7 +100,7 @@ export default function RoundResultsScreen({
 
               <ScoreBar score={r.total_score} />
 
-              <div className="grid grid-cols-3 gap-2 mt-3 text-xs">
+              <div className="grid grid-cols-2 gap-2 mt-3 text-xs">
                 <div className="text-center">
                   <div className="text-slate-500 mb-0.5">Country</div>
                   <div className="text-slate-300 font-medium truncate">
@@ -131,21 +131,6 @@ export default function RoundResultsScreen({
                     }
                   >
                     {r.language_score}pts
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-slate-500 mb-0.5">Year</div>
-                  <div className="text-slate-300 font-medium">{r.year}</div>
-                  <div
-                    className={
-                      r.year_score >= 80
-                        ? "text-neon-green"
-                        : r.year_score > 0
-                        ? "text-yellow-400"
-                        : "text-red-400"
-                    }
-                  >
-                    {r.year_score}pts
                   </div>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { CheckCircle, Clock, MapPin, Globe, Calendar } from "lucide-react";
+import { CheckCircle, Clock, MapPin, Globe } from "lucide-react";
 import type { RoomState, ArticleContent } from "@/lib/types";
 
 const ROUND_DURATION = 60;
@@ -12,7 +12,7 @@ interface Props {
   playerName: string;
   isHost: boolean;
   guessSubmitted: boolean;
-  onSubmitGuess: (country: string, language: string, year: number) => void;
+  onSubmitGuess: (country: string, language: string, year: number) => void; // year kept for API compat
   onTimerEnd?: () => void;
 }
 
@@ -28,7 +28,6 @@ export default function GameScreen({
   const [timeLeft, setTimeLeft] = useState(ROUND_DURATION);
   const [country, setCountry] = useState("");
   const [language, setLanguage] = useState("");
-  const [year, setYear] = useState(2020);
   const [submitted, setSubmitted] = useState(guessSubmitted);
   const [displayedText, setDisplayedText] = useState("");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -44,6 +43,9 @@ export default function GameScreen({
   }, [guessSubmitted]);
 
   useEffect(() => {
+    setSubmitted(false);
+    setCountry("");
+    setLanguage("");
     setDisplayedText("");
     setTimeLeft(ROUND_DURATION);
     timerEndCalled.current = false;
@@ -83,7 +85,7 @@ export default function GameScreen({
     e.preventDefault();
     if (!country.trim() || !language.trim()) return;
     setSubmitted(true);
-    onSubmitGuess(country.trim(), language.trim(), year);
+    onSubmitGuess(country.trim(), language.trim(), 0);
   }
 
   const progress = (timeLeft / ROUND_DURATION) * 100;
@@ -223,25 +225,6 @@ export default function GameScreen({
             </div>
           </div>
 
-          <div>
-            <label className="flex items-center gap-2 text-xs text-slate-400 mb-2">
-              <Calendar className="w-3 h-3" /> Year:{" "}
-              <span className="text-neon-purple font-bold text-sm">{year}</span>
-            </label>
-            <input
-              type="range"
-              min="2010"
-              max="2024"
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              className="w-full h-2 appearance-none bg-slate-700 rounded-full cursor-pointer accent-purple-500"
-            />
-            <div className="flex justify-between text-xs text-slate-600 mt-1">
-              <span>2010</span>
-              <span>2024</span>
-            </div>
-          </div>
-
           <button
             type="submit"
             disabled={timeLeft === 0}
@@ -267,10 +250,6 @@ export default function GameScreen({
             <div className="glass px-3 py-2 rounded-lg border border-slate-700">
               <span className="text-slate-500">Language:</span>{" "}
               <span className="text-white font-bold">{language || "—"}</span>
-            </div>
-            <div className="glass px-3 py-2 rounded-lg border border-slate-700">
-              <span className="text-slate-500">Year:</span>{" "}
-              <span className="text-white font-bold">{year}</span>
             </div>
           </div>
           {isHost && timeLeft > 0 && (

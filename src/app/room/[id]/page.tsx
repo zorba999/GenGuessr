@@ -59,12 +59,19 @@ export default function RoomPage() {
         }
       }
 
-      if (data.phase === "round_results" && phaseChanged) {
+      if (data.phase === "round_results") {
         const roundToFetch = data.current_round;
         const resRes = await fetch(`/api/results/${roomId}?round=${roundToFetch}`);
         if (resRes.ok) {
           const resData: RoundResultsData = await resRes.json();
           setRoundResults(resData);
+          if (resData.results.length > 0 && Object.keys(data.total_scores ?? {}).length === 0) {
+            const newTotals: Record<string, number> = { ...data.total_scores };
+            resData.results.forEach((r) => {
+              newTotals[r.player] = (newTotals[r.player] ?? 0) + r.total_score;
+            });
+            setRoomState({ ...data, total_scores: newTotals });
+          }
         }
       }
 
@@ -162,6 +169,7 @@ export default function RoomPage() {
           setRoundResults(null);
           articleContentRef.current = null;
           if (data.room.phase === "playing") {
+            setGuessSubmitted(false);
             setArticleContent(null);
             const artRes = await fetch(`/api/article/${roomId}`);
             if (artRes.ok) {

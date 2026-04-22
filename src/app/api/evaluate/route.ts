@@ -18,19 +18,19 @@ export async function POST(req: NextRequest) {
     const articleIdx = room.article_indices[room.current_round];
     const article = ARTICLES[articleIdx];
 
-    await submitContract("evaluate_round", [
+    updateRoom(roomId, {
+      phase: "round_results",
+      last_round_article_id: articleIdx,
+    });
+
+    submitContract("evaluate_round", [
       roomId,
       room.current_round,
       article.country,
       article.language,
       article.year,
       JSON.stringify(room.players),
-    ]);
-
-    updateRoom(roomId, {
-      phase: "round_results",
-      last_round_article_id: articleIdx,
-    });
+    ]).catch((e) => console.error("[evaluate] contract error:", e));
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {

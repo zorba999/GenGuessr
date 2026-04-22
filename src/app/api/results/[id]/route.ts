@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readContract } from "@/lib/genlayer";
-import { getRoom } from "@/lib/roomStore";
+import { getRoom, updateRoom } from "@/lib/roomStore";
 import { ARTICLES } from "@/lib/articles";
 
 export async function GET(
@@ -12,19 +12,40 @@ export async function GET(
     const roundParam = req.nextUrl.searchParams.get("round") ?? "0";
     const roundNum = Number(roundParam);
 
-    const contractResults = (await readContract("get_round_results", [
-      id,
-      roundNum,
-    ])) as { scores: unknown[]; actual: unknown } | null;
+    let contractResults: { scores: unknown[]; actual: unknown } | null = null;
+    try {
+      contractResults = (await readContract("get_round_results", [
+        id,
+        roundNum,
+      ])) as { scores: unknown[]; actual: unknown } | null;
+    } catch {
+      contractResults = null;
+    }
 
     if (contractResults) {
-      return NextResponse.json(contractResults);
+      const scores: any[] = (contractResults as any).scores ?? (contractResults as any).results ?? [];
+      const normalized = { results: scores, actual: (contractResults as any).actual };
+      if (scores.length > 0) {
+        const room = getRoom(id);
+        if (room) {
+          const newTotals = { ...room.total_scores };
+          scores.forEach((s: any) => {
+            newTotals[s.player] = (newTotals[s.player] ?? 0) + (s.total ?? s.total_score ?? 0);
+          });
+          updateRoom(id, { total_scores: newTotals });
+        }
+      }
+      return NextResponse.json(normalized);
     }
 
     const room = getRoom(id);
     if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    const articleIdx = room.article_indices[roundNum];
-    const article = ARTICLES[articleIdx];
+    const indices = room.article_indices?.length
+      ? room.article_indices
+      : (await import("@/lib/articles")).selectArticles(id);
+    const articleIdx = indices[roundNum];
+    const { ARTICLES } = await import("@/lib/articles");
+    const article = ARTICLES[articleIdx] ?? ARTICLES[0];
     return NextResponse.json({
       results: [],
       actual: { country: article.country, language: article.language, year: article.year },
