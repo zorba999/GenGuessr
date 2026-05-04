@@ -33,7 +33,7 @@ const WIKI_POOL = [
   { lang: "ro", country: "Romania", language: "Romanian" },
 ];
 
-const TOTAL_ROUNDS = 5;
+const TOTAL_ROUNDS = 10;
 const MIN_LENGTH = 250;
 const MAX_LENGTH = 700;
 

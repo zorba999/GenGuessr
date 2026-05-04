@@ -45,7 +45,7 @@ export const ARTICLES: Article[] = [
   { id: 35, content: "Según el último informe del Instituto Nacional de Estadística, la tasa de desempleo juvenil bajó al quince por ciento por primera vez desde la crisis financiera, impulsada por las nuevas contrataciones en el sector tecnológico y el turismo.", country: "Spain", language: "Spanish", year: 2023 },
 ];
 
-const TOTAL_ROUNDS = 5;
+const TOTAL_ROUNDS = 10;
 
 function getISOWeek(date: Date): number {
   const d = new Date(date);

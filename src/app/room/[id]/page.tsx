@@ -28,6 +28,7 @@ export default function RoomPage() {
   const articleContentRef = useRef<ArticleContent | null>(null);
   const isPollingRef = useRef(false);
   const isFetchingArticleRef = useRef(false);
+  const evaluateLockRef = useRef(false);
 
   const isHost = roomState?.host === playerName;
 
@@ -58,6 +59,7 @@ export default function RoomPage() {
 
       const phaseChanged = prevPhaseRef.current !== data.phase;
       const roundChanged = prevRoundRef.current !== data.current_round;
+      if (roundChanged) evaluateLockRef.current = false;
 
       if (data.phase === "playing") {
         if (phaseChanged || roundChanged) {
@@ -81,6 +83,15 @@ export default function RoomPage() {
 
       if (data.phase === "playing" && (phaseChanged || roundChanged)) {
         setRoundResults(null);
+      }
+
+      if (
+        data.phase === "playing" &&
+        data.all_submitted_round === data.current_round &&
+        !evaluateLockRef.current
+      ) {
+        const isHostNow = data.host === playerName;
+        if (isHostNow) handleEvaluate();
       }
 
       if (data.phase !== "playing") {
@@ -147,6 +158,8 @@ export default function RoomPage() {
   }
 
   async function handleEvaluate() {
+    if (evaluateLockRef.current) return;
+    evaluateLockRef.current = true;
     try {
       const roundNum = roomState?.current_round ?? 0;
       const res = await fetch("/api/evaluate", {

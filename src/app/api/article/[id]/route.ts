@@ -26,7 +26,7 @@ export async function GET(
     }
 
     let articleIndices = room.article_indices;
-    const TOTAL_ROUNDS = 5;
+    const TOTAL_ROUNDS = 10;
     if (!articleIndices || articleIndices.length < TOTAL_ROUNDS ||
         articleIndices.some(i => i < 0 || i >= ARTICLES.length)) {
       console.log(`[article] Recomputing article indices for room ${id}`);

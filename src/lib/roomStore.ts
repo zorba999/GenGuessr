@@ -4,7 +4,7 @@ import type { GamePhase, RoomState } from "./types";
 import fs from "fs";
 import path from "path";
 
-const TOTAL_ROUNDS = 5;
+const TOTAL_ROUNDS = 10;
 
 declare global {
   // eslint-disable-next-line no-var

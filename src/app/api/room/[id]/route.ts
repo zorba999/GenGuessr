@@ -48,7 +48,7 @@ export async function POST(
         const room = await setPhase(id, "results");
         return NextResponse.json({ success: true, room });
       }
-      const room = await updateRoom(id, { current_round: nextRound, phase: "playing" });
+      const room = await updateRoom(id, { current_round: nextRound, phase: "playing", all_submitted_round: undefined });
       return NextResponse.json({ success: true, room });
     }
 
