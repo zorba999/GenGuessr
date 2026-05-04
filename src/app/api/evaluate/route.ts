@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { submitContract } from "@/lib/genlayer";
-import { getRoom, setPhase, updateRoom, getRoundGuesses } from "@/lib/roomStore";
+import { getRoom, setPhase, updateRoom, getRoundGuesses, ensureRoom } from "@/lib/roomStore";
 import { ARTICLES } from "@/lib/articles";
 
 export async function POST(req: NextRequest) {
@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "roomId required" }, { status: 400 });
     }
 
+    await ensureRoom(roomId);
     const room = getRoom(roomId);
     if (!room) {
       console.error(`[evaluate] Room not found: "${roomId}"`);

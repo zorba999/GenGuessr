@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRoom, updateRoom } from "@/lib/roomStore";
+import { getRoom, updateRoom, ensureRoom } from "@/lib/roomStore";
 import { ARTICLES, selectArticles } from "@/lib/articles";
 
 export async function GET(
@@ -8,6 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    await ensureRoom(id);
     const room = getRoom(id);
     if (!room) {
       console.error(`[article] Room not found: ${id}`);

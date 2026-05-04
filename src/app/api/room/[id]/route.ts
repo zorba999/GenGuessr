@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRoom, joinRoom, setPhase, updateRoom } from "@/lib/roomStore";
+import { getRoom, joinRoom, setPhase, updateRoom, ensureRoom } from "@/lib/roomStore";
 
 export async function GET(
   _req: NextRequest,
@@ -7,6 +7,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    await ensureRoom(id);
     const room = getRoom(id);
     if (!room) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
@@ -25,6 +26,7 @@ export async function POST(
   try {
     const { id } = await params;
     const { action, playerName } = await req.json();
+    await ensureRoom(id);
 
     if (action === "join") {
       const room = joinRoom(id, playerName);

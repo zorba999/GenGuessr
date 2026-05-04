@@ -41,6 +41,49 @@ function getStore(): Map<string, RoomState> {
   return global.__roomStore;
 }
 
+async function getBlobStore() {
+  try {
+    const { getStore: getNBStore } = await import("@netlify/blobs");
+    return getNBStore("rooms");
+  } catch {
+    return null;
+  }
+}
+
+async function saveToBlob(roomId: string, room: RoomState) {
+  try {
+    const blob = await getBlobStore();
+    if (blob) await blob.setJSON(roomId, room);
+  } catch (e) {
+    console.error("[roomStore] saveToBlob failed:", e);
+  }
+}
+
+async function loadFromBlob(roomId: string): Promise<RoomState | null> {
+  try {
+    const blob = await getBlobStore();
+    if (!blob) return null;
+    const data = await blob.get(roomId, { type: "json" });
+    return data as RoomState | null;
+  } catch {
+    return null;
+  }
+}
+
+export async function ensureRoom(roomId: string): Promise<void> {
+  const store = getStore();
+  if (store.has(roomId)) return;
+  const room = await loadFromBlob(roomId);
+  if (room) {
+    store.set(roomId, room);
+    console.log(`[roomStore] restored room ${roomId} from Blobs`);
+  } else if (store.size === 0) {
+    const reloaded = loadFromDisk();
+    reloaded.forEach((v, k) => store.set(k, v));
+    if (store.size > 0) console.log(`[roomStore] restored ${store.size} rooms from disk`);
+  }
+}
+
 export async function createRoom(roomId: string, hostName: string): Promise<RoomState> {
   const room: RoomState = {
     room_id: roomId,
@@ -55,15 +98,19 @@ export async function createRoom(roomId: string, hostName: string): Promise<Room
   const store = getStore();
   store.set(roomId, room);
   saveToDisk(store);
+  saveToBlob(roomId, room);
 
   fetchGameArticles().then((articles) => {
-    if (articles.length === TOTAL_ROUNDS) {
-      const updated = { ...getRoom(roomId)!, wiki_articles: articles };
-      store.set(roomId, updated);
-      saveToDisk(store);
+    const currentStore = getStore();
+    const currentRoom = currentStore.get(roomId);
+    if (articles.length === TOTAL_ROUNDS && currentRoom) {
+      const updated = { ...currentRoom, wiki_articles: articles };
+      currentStore.set(roomId, updated);
+      saveToDisk(currentStore);
+      saveToBlob(roomId, updated);
       console.log(`[roomStore] Wikipedia articles ready for room ${roomId}`);
     } else {
-      console.warn(`[roomStore] Only got ${articles.length} wiki articles for ${roomId}, using fallback`);
+      console.warn(`[roomStore] wiki fetch: got ${articles.length} articles, room found=${!!currentRoom}`);
     }
   }).catch((e) => console.error("[roomStore] fetchGameArticles failed:", e));
 
@@ -100,6 +147,7 @@ export function updateRoom(roomId: string, updates: Partial<RoomState>): RoomSta
   const updated = { ...room, ...updates };
   store.set(roomId, updated);
   saveToDisk(store);
+  saveToBlob(roomId, updated);
   return updated;
 }
 

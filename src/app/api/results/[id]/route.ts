@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readContract } from "@/lib/genlayer";
-import { getRoom, updateRoom } from "@/lib/roomStore";
+import { getRoom, updateRoom, ensureRoom } from "@/lib/roomStore";
 import { ARTICLES } from "@/lib/articles";
 
 export async function GET(
@@ -38,6 +38,7 @@ export async function GET(
       return NextResponse.json(normalized);
     }
 
+    await ensureRoom(id);
     const room = getRoom(id);
     if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
 
