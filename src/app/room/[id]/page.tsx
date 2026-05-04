@@ -17,7 +17,6 @@ export default function RoomPage() {
 
   const { address } = useAccount();
   const playerName = address ? shortenAddress(address) : (localStorage.getItem("playerName") || "Anonymous");
-  const [isHost, setIsHost] = useState(false);
   const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [articleContent, setArticleContent] = useState<ArticleContent | null>(null);
   const [roundResults, setRoundResults] = useState<RoundResultsData | null>(null);
@@ -30,10 +29,7 @@ export default function RoomPage() {
   const isPollingRef = useRef(false);
   const isFetchingArticleRef = useRef(false);
 
-  useEffect(() => {
-    const host = localStorage.getItem("isHost") === "true";
-    setIsHost(host);
-  }, []);
+  const isHost = roomState?.host === playerName;
 
   const loadArticle = useCallback(async () => {
     if (isFetchingArticleRef.current) return;
@@ -80,16 +76,11 @@ export default function RoomPage() {
         if (resRes.ok) {
           const resData: RoundResultsData = await resRes.json();
           setRoundResults(resData);
-          if (resData.results.length > 0) {
-            const newTotals: Record<string, number> = { ...data.total_scores };
-            resData.results.forEach((r) => {
-              newTotals[r.player] = (newTotals[r.player] ?? 0) + r.total_score;
-            });
-            if (JSON.stringify(newTotals) !== JSON.stringify(data.total_scores)) {
-              setRoomState({ ...data, total_scores: newTotals });
-            }
-          }
         }
+      }
+
+      if (data.phase === "playing" && (phaseChanged || roundChanged)) {
+        setRoundResults(null);
       }
 
       if (data.phase !== "playing") {

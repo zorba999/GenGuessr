@@ -28,7 +28,7 @@ export default function RoundResultsScreen({
   isHost,
   onNextRound,
 }: Props) {
-  const isLastRound = roomState.current_round >= roomState.total_rounds;
+  const isLastRound = roomState.current_round >= roomState.total_rounds - 1;
   const sortedResults = [...results.results].sort(
     (a, b) => b.total_score - a.total_score
   );
@@ -39,7 +39,7 @@ export default function RoundResultsScreen({
         {/* Header */}
         <div className="text-center mb-6 animate-slide-up">
           <div className="text-xs font-bold text-neon-green uppercase tracking-widest mb-1">
-            Round {roomState.current_round}/{roomState.total_rounds} Results
+            Round {roomState.current_round + 1}/{roomState.total_rounds} Results
           </div>
           <h2 className="text-3xl font-black text-white mb-3">
             AI Verdict Is In!
