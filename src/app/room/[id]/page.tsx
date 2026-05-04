@@ -139,10 +139,11 @@ export default function RoomPage() {
 
   async function handleEvaluate() {
     try {
+      const roundNum = roomState?.current_round ?? 0;
       const res = await fetch("/api/evaluate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomId }),
+        body: JSON.stringify({ roomId, roundNum }),
       });
       if (!res.ok) {
         const data = await res.json();

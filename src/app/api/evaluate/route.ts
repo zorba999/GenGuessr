@@ -5,7 +5,7 @@ import { ARTICLES } from "@/lib/articles";
 
 export async function POST(req: NextRequest) {
   try {
-    const { roomId } = await req.json();
+    const { roomId, roundNum: clientRound } = await req.json();
     if (!roomId) {
       return NextResponse.json({ error: "roomId required" }, { status: 400 });
     }
@@ -13,9 +13,20 @@ export async function POST(req: NextRequest) {
     const room = getRoom(roomId);
     if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
 
-    setPhase(roomId, "scoring");
+    const roundNum = clientRound ?? room.current_round;
 
-    const articleIdx = room.article_indices[room.current_round];
+    if (clientRound != null && clientRound !== room.current_round) {
+      console.warn(`[evaluate] round mismatch: client=${clientRound} server=${room.current_round}, using client`);
+    }
+
+    const articleIndices = room.article_indices?.length >= (roundNum + 1)
+      ? room.article_indices
+      : (await import("@/lib/articles")).selectArticles(roomId);
+
+    const articleIdx = articleIndices[roundNum];
+    if (articleIdx === undefined) {
+      return NextResponse.json({ error: `No article for round ${roundNum}` }, { status: 400 });
+    }
     const article = ARTICLES[articleIdx];
 
     updateRoom(roomId, {
@@ -25,12 +36,14 @@ export async function POST(req: NextRequest) {
 
     submitContract("evaluate_round", [
       roomId,
-      room.current_round,
+      roundNum,
       article.country,
       article.language,
       article.year,
       JSON.stringify(room.players),
     ]).catch((e) => console.error("[evaluate] contract error:", e));
+
+    console.log(`[evaluate] room=${roomId} round=${roundNum} article=${article.country}/${article.language}`);
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
