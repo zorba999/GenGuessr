@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const articleIndices = room.article_indices?.length >= (roundNum + 1)
       ? room.article_indices
-      : (await import("@/lib/articles")).selectArticles(roomId);
+      : (await import("@/lib/articles")).selectArticles((await import("@/lib/articles")).generateArticleSeed());
 
     const articleIdx = articleIndices[roundNum];
     if (articleIdx === undefined) {

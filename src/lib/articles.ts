@@ -55,12 +55,9 @@ function getISOWeek(date: Date): number {
   return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }
 
-export function selectArticles(roomId: string, now: Date = new Date()): number[] {
-  const week = getISOWeek(now);
-  const year = now.getUTCFullYear();
-  const weeklySeed = `${year}-W${week}`;
+export function selectArticles(seed: string): number[] {
   let h = 0;
-  for (const c of weeklySeed + roomId) {
+  for (const c of seed) {
     h = ((h * 31 + c.charCodeAt(0)) >>> 0);
   }
   const n = ARTICLES.length;
@@ -72,4 +69,8 @@ export function selectArticles(roomId: string, now: Date = new Date()): number[]
     offset++;
   }
   return indices;
+}
+
+export function generateArticleSeed(): string {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }

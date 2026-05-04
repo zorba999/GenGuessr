@@ -19,7 +19,8 @@ export async function GET(
     if (!articleIndices || articleIndices.length < TOTAL_ROUNDS ||
         articleIndices.some(i => i < 0 || i >= ARTICLES.length)) {
       console.log(`[article] Recomputing article indices for room ${id}`);
-      articleIndices = selectArticles(id);
+      const { generateArticleSeed } = await import("@/lib/articles");
+      articleIndices = selectArticles(generateArticleSeed());
       updateRoom(id, { article_indices: articleIndices });
     }
     const articleIdx = articleIndices[roundIdx];

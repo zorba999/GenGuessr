@@ -1,4 +1,4 @@
-import { selectArticles } from "./articles";
+import { selectArticles, generateArticleSeed } from "./articles";
 import type { GamePhase, RoomState } from "./types";
 import fs from "fs";
 import path from "path";
@@ -48,7 +48,7 @@ export function createRoom(roomId: string, hostName: string): RoomState {
     phase: "waiting",
     current_round: 0,
     total_rounds: TOTAL_ROUNDS,
-    article_indices: selectArticles(roomId),
+    article_indices: selectArticles(generateArticleSeed()),
     total_scores: {},
   };
   const store = getStore();
