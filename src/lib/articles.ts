@@ -27,13 +27,40 @@ export const ARTICLES: Article[] = [
   { id: 17, content: "Le festival annuel de gnawa a réuni cette année des musiciens venus de plusieurs continents pour des nuits de transe et de rituel dans les riads de la médina. Les maâlems, gardiens de cette tradition pluriséculaire, ont partagé la scène avec des artistes de jazz et de soul dans des fusions inédites.", country: "Morocco", language: "French", year: 2022 },
   { id: 18, content: "La estación de esquí registró su temporada más concurrida en una década, con más de cuatrocientos mil visitantes entre diciembre y marzo. Las autoridades regionales atribuyeron el éxito a la excepcional nevada de principios de invierno y a la mejora de las conexiones de transporte desde la capital.", country: "Spain", language: "Spanish", year: 2023 },
   { id: 19, content: "Thousands lined the streets for the annual independence celebration, a tradition that has marked this date since the country gained sovereignty. Steel pan bands from every district competed for the national trophy while masquerade troupes performed in costumes that had taken months to prepare.", country: "Trinidad and Tobago", language: "English", year: 2022 },
+  { id: 20, content: "O governo anunciou um pacote de investimentos para a construção de novas escolas nas regiões Norte e Nordeste, com recursos provenientes do fundo de educação. O ministro destacou que a medida vai beneficiar mais de trezentos mil alunos e gerar noventa mil empregos diretos na área da construção civil.", country: "Brazil", language: "Portuguese", year: 2023 },
+  { id: 21, content: "Οι αρχαιολόγοι ανακάλυψαν νέα ψηφιδωτά στην αρχαία αγορά, τα οποία απεικονίζουν σκηνές από τους Ολυμπιακούς Αγώνες της αρχαιότητας. Η ανασκαφή, που διεξάγεται σε συνεργασία με ευρωπαϊκά πανεπιστήμια, αναμένεται να ολοκληρωθεί τον επόμενο χρόνο.", country: "Greece", language: "Greek", year: 2022 },
+  { id: 22, content: "Il comune ha approvato il nuovo piano di mobilità sostenibile che prevede la chiusura al traffico privato del centro storico nei fine settimana. I residenti potranno utilizzare gratuitamente i mezzi pubblici potenziati, mentre le piste ciclabili saranno estese di ulteriori venti chilometri.", country: "Italy", language: "Italian", year: 2023 },
+  { id: 23, content: "Сильные снегопады на Урале привели к задержкам на федеральной трассе М5, где в снежном плену оказались более двухсот автомобилей. Спасатели МЧС работали всю ночь, обеспечивая водителей горячим питанием и расчищая дорогу от заносов.", country: "Russia", language: "Russian", year: 2022 },
+  { id: 24, content: "Amid preparations for the national day parade, the armed forces rehearsed a new drone formation display above the financial district. The performance, featuring over three hundred unmanned aerial vehicles, is set to be broadcast live on national television and streamed internationally.", country: "Singapore", language: "English", year: 2023 },
+  { id: 25, content: "A szüret ideje alatt a Balaton-felvidéki szőlőültetvényeken dolgozó termelők rekordmennyiségű olaszrizlinget szüreteltek. A Borászok Országos Szövetsége közleményben jelezte, hogy a kedvező időjárás miatt az idei évjárat az évtized egyik legkiemelkedőbbjének ígérkezik.", country: "Hungary", language: "Hungarian", year: 2022 },
+  { id: 26, content: "خبرگزاری رسمی گزارش داد که در جشنواره بین‌المللی فیلم تهران، بیش از دویست فیلم کوتاه و بلند از پنجاه کشور به نمایش درآمد. بخش ویژه‌ای نیز به سینمای مستند اختصاص داشت که با استقبال چشمگیر منتقدان روبرو شد.", country: "Iran", language: "Persian", year: 2023 },
+  { id: 27, content: "เจ้าหน้าที่สาธารณสุขจังหวัดเชียงใหม่ประกาศเตือนภัยฝุ่น PM2.5 เกินมาตรฐานเป็นวันที่สิบสองติดต่อกัน ชาวบ้านในพื้นที่ได้รับแจกหน้ากาก N95 ฟรีจากองค์การบริหารส่วนจังหวัด ขณะที่โรงเรียนหลายแห่งประกาศปิดการเรียนการสอน", country: "Thailand", language: "Thai", year: 2023 },
+  { id: 28, content: "Die Österreichische Nationalbibliothek hat eine neue digitale Plattform gestartet, auf der über eine Million historische Dokumente kostenlos eingesehen werden können. Darunter befinden sich mittelalterliche Handschriften, Karten und Fotografien aus dem 19. Jahrhundert.", country: "Austria", language: "German", year: 2023 },
+  { id: 29, content: "O aumento das temperaturas no Alentejo levou ao registo de vários incêndios florestais que destruíram mais de dois mil hectares de mato e pinhal. Os bombeiros voluntários das freguesias vizinhas trabalharam durante três dias consecutivos para conter as chamas.", country: "Portugal", language: "Portuguese", year: 2022 },
+  { id: 30, content: "Ekibin yıllar süren çalışmalarının ardından geliştirilen yeni aşı, Sağlık Bakanlığı tarafından acil kullanım onayı aldı. Klinik denemelerde yüzde seksen beş etkinlik oranı gösteren aşı, öncelikli olarak riskli gruplara uygulanmaya başlandı.", country: "Turkey", language: "Turkish", year: 2023 },
+  { id: 31, content: "수도권 광역급행철도 GTX-A 노선이 개통되면서 경기도 북부에서 서울 도심까지의 통근 시간이 기존 한 시간 이상에서 이십 분대로 단축됐다. 개통 첫 주 이용객은 예상치를 두 배 이상 웃돌았으며, 인근 부동산 시장도 뜨겁게 달아오르고 있다.", country: "South Korea", language: "Korean", year: 2024 },
+  { id: 32, content: "Il n'est pas rare de voir des files d'attente serpenter devant la boulangerie primée dès six heures du matin. La baguette tradition de la maison, qui a remporté le concours de la meilleure baguette de Paris pour la troisième année consécutive, attire des clients venus de tous les arrondissements.", country: "France", language: "French", year: 2023 },
+  { id: 33, content: "Voters in the northern provinces turned out in record numbers for the local elections, with turnout exceeding eighty percent in several districts. The incumbent party retained its majority in most councils, though the opposition made unexpected gains in three coastal municipalities.", country: "Australia", language: "English", year: 2023 },
+  { id: 34, content: "देश के सबसे बड़े त्योहार की तैयारियों में जुटे कारीगरों ने बताया कि मूर्तियों की मांग इस साल पिछले वर्ष की तुलना में तीस प्रतिशत अधिक है। पर्यावरण के प्रति जागरूकता के चलते इस बार मिट्टी और प्राकृतिक रंगों से बनी मूर्तियों की बिक्री विशेष रूप से बढ़ी है।", country: "India", language: "Hindi", year: 2023 },
+  { id: 35, content: "Según el último informe del Instituto Nacional de Estadística, la tasa de desempleo juvenil bajó al quince por ciento por primera vez desde la crisis financiera, impulsada por las nuevas contrataciones en el sector tecnológico y el turismo.", country: "Spain", language: "Spanish", year: 2023 },
 ];
 
-const TOTAL_ROUNDS = 3;
+const TOTAL_ROUNDS = 5;
 
-export function selectArticles(roomId: string): number[] {
+function getISOWeek(date: Date): number {
+  const d = new Date(date);
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+}
+
+export function selectArticles(roomId: string, now: Date = new Date()): number[] {
+  const week = getISOWeek(now);
+  const year = now.getUTCFullYear();
+  const weeklySeed = `${year}-W${week}`;
   let h = 0;
-  for (const c of roomId) {
+  for (const c of weeklySeed + roomId) {
     h = ((h * 31 + c.charCodeAt(0)) >>> 0);
   }
   const n = ARTICLES.length;

@@ -3,6 +3,8 @@ import type { GamePhase, RoomState } from "./types";
 import fs from "fs";
 import path from "path";
 
+const TOTAL_ROUNDS = 5;
+
 declare global {
   // eslint-disable-next-line no-var
   var __roomStore: Map<string, RoomState> | undefined;
@@ -43,7 +45,7 @@ export function createRoom(roomId: string, hostName: string): RoomState {
     players: [hostName],
     phase: "waiting",
     current_round: 0,
-    total_rounds: 3,
+    total_rounds: TOTAL_ROUNDS,
     article_indices: selectArticles(roomId),
     total_scores: {},
   };
