@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       article = ARTICLES[articleIdx];
     }
 
-    updateRoom(roomId, {
+    await updateRoom(roomId, {
       phase: "round_results",
     });
 
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
         localScores.forEach((s) => {
           newTotals[s.player] = (newTotals[s.player] ?? 0) + s.total_score;
         });
-        updateRoom(roomId, {
+        await updateRoom(roomId, {
           phase: "round_results",
           total_scores: newTotals,
           [`round_${roundNum}_scores`]: localScores,

@@ -29,13 +29,13 @@ export async function POST(
     await ensureRoom(id);
 
     if (action === "join") {
-      const room = joinRoom(id, playerName);
+      const room = await joinRoom(id, playerName);
       if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
       return NextResponse.json({ success: true, room });
     }
 
     if (action === "start") {
-      const room = setPhase(id, "playing");
+      const room = await setPhase(id, "playing");
       if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
       return NextResponse.json({ success: true, room });
     }
@@ -45,10 +45,10 @@ export async function POST(
       if (!current) return NextResponse.json({ error: "Room not found" }, { status: 404 });
       const nextRound = current.current_round + 1;
       if (nextRound >= current.total_rounds) {
-        const room = setPhase(id, "results");
+        const room = await setPhase(id, "results");
         return NextResponse.json({ success: true, room });
       }
-      const room = updateRoom(id, { current_round: nextRound, phase: "playing" });
+      const room = await updateRoom(id, { current_round: nextRound, phase: "playing" });
       return NextResponse.json({ success: true, room });
     }
 

@@ -98,7 +98,7 @@ export async function createRoom(roomId: string, hostName: string): Promise<Room
   const store = getStore();
   store.set(roomId, room);
   saveToDisk(store);
-  saveToBlob(roomId, room);
+  await saveToBlob(roomId, room);
 
   fetchGameArticles().then((articles) => {
     const currentStore = getStore();
@@ -127,7 +127,7 @@ export function getRoom(roomId: string): RoomState | null {
   return store.get(roomId) ?? null;
 }
 
-export function joinRoom(roomId: string, playerName: string): RoomState | null {
+export async function joinRoom(roomId: string, playerName: string): Promise<RoomState | null> {
   const store = getStore();
   const room = store.get(roomId);
   if (!room) return null;
@@ -136,22 +136,23 @@ export function joinRoom(roomId: string, playerName: string): RoomState | null {
     room.players = [...room.players, playerName];
     store.set(roomId, room);
     saveToDisk(store);
+    await saveToBlob(roomId, room);
   }
   return room;
 }
 
-export function updateRoom(roomId: string, updates: Partial<RoomState>): RoomState | null {
+export async function updateRoom(roomId: string, updates: Partial<RoomState>): Promise<RoomState | null> {
   const store = getStore();
   const room = store.get(roomId);
   if (!room) return null;
   const updated = { ...room, ...updates };
   store.set(roomId, updated);
   saveToDisk(store);
-  saveToBlob(roomId, updated);
+  await saveToBlob(roomId, updated);
   return updated;
 }
 
-export function setPhase(roomId: string, phase: GamePhase): RoomState | null {
+export async function setPhase(roomId: string, phase: GamePhase): Promise<RoomState | null> {
   return updateRoom(roomId, { phase });
 }
 

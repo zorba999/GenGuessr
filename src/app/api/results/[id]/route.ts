@@ -32,7 +32,7 @@ export async function GET(
           scores.forEach((s: any) => {
             newTotals[s.player] = (newTotals[s.player] ?? 0) + (s.total ?? s.total_score ?? 0);
           });
-          updateRoom(id, { total_scores: newTotals });
+          await updateRoom(id, { total_scores: newTotals });
         }
       }
       return NextResponse.json(normalized);
