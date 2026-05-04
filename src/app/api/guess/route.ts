@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { submitContract } from "@/lib/genlayer";
-import { getRoom } from "@/lib/roomStore";
+import { getRoom, saveGuess } from "@/lib/roomStore";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,14 +16,16 @@ export async function POST(req: NextRequest) {
     const room = getRoom(roomId);
     const roundNum = room?.current_round ?? 0;
 
-    await submitContract("submit_guess", [
+    saveGuess(roomId, roundNum, playerName, country, language, Number(year));
+
+    submitContract("submit_guess", [
       roomId,
       roundNum,
       playerName,
       country,
       language,
       Number(year),
-    ]);
+    ]).catch((e) => console.error("[guess] contract error:", e));
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {

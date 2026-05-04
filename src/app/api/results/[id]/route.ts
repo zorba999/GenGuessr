@@ -46,8 +46,11 @@ export async function GET(
     const articleIdx = indices[roundNum];
     const { ARTICLES } = await import("@/lib/articles");
     const article = ARTICLES[articleIdx] ?? ARTICLES[0];
+
+    const localScores = (room as any)[`round_${roundNum}_scores`] ?? [];
+
     return NextResponse.json({
-      results: [],
+      results: localScores,
       actual: { country: article.country, language: article.language, year: article.year },
     });
   } catch (err: unknown) {

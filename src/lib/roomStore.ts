@@ -85,3 +85,28 @@ export function updateRoom(roomId: string, updates: Partial<RoomState>): RoomSta
 export function setPhase(roomId: string, phase: GamePhase): RoomState | null {
   return updateRoom(roomId, { phase });
 }
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __guessStore: Map<string, { player: string; country: string; language: string; year: number }[]> | undefined;
+}
+
+function getGuessStore() {
+  if (!global.__guessStore) global.__guessStore = new Map();
+  return global.__guessStore;
+}
+
+export function saveGuess(roomId: string, round: number, player: string, country: string, language: string, year: number) {
+  const store = getGuessStore();
+  const key = `${roomId}:${round}`;
+  const guesses = store.get(key) ?? [];
+  const existing = guesses.findIndex((g) => g.player === player);
+  const entry = { player, country, language, year };
+  if (existing >= 0) guesses[existing] = entry;
+  else guesses.push(entry);
+  store.set(key, guesses);
+}
+
+export function getRoundGuesses(roomId: string, round: number) {
+  return getGuessStore().get(`${roomId}:${round}`) ?? [];
+}

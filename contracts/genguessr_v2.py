@@ -40,19 +40,28 @@ class GenGuessr(gl.Contract):
         actual_year: int,
         players_json: str,
     ) -> None:
-        players = json.loads(players_json)
+        players_data = json.loads(players_json)
 
         player_guesses = []
-        for player in players:
-            key = f"{room_id}:{round_num}:{player}"
-            if key in self.guesses:
-                g = json.loads(self.guesses[key])
+        for item in players_data:
+            if isinstance(item, dict) and "country" in item:
                 player_guesses.append({
-                    "player": player,
-                    "country": g["country"],
-                    "language": g["language"],
-                    "year": g["year"],
+                    "player": item["player"],
+                    "country": item["country"],
+                    "language": item["language"],
+                    "year": item.get("year", 0),
                 })
+            else:
+                player = str(item)
+                key = f"{room_id}:{round_num}:{player}"
+                if key in self.guesses:
+                    g = json.loads(self.guesses[key])
+                    player_guesses.append({
+                        "player": player,
+                        "country": g["country"],
+                        "language": g["language"],
+                        "year": g["year"],
+                    })
 
         if not player_guesses:
             return
