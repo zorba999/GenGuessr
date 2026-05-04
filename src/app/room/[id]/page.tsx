@@ -30,6 +30,7 @@ export default function RoomPage() {
   const isFetchingArticleRef = useRef(false);
   const evaluateLockRef = useRef(false);
 
+
   const isHost = roomState?.host === playerName;
 
   const loadArticle = useCallback(async () => {
@@ -61,6 +62,7 @@ export default function RoomPage() {
       const roundChanged = prevRoundRef.current !== data.current_round;
       if (roundChanged) evaluateLockRef.current = false;
 
+
       if (data.phase === "playing") {
         if (phaseChanged || roundChanged) {
           setGuessSubmitted(false);
@@ -83,15 +85,6 @@ export default function RoomPage() {
 
       if (data.phase === "playing" && (phaseChanged || roundChanged)) {
         setRoundResults(null);
-      }
-
-      if (
-        data.phase === "playing" &&
-        data.all_submitted_round === data.current_round &&
-        !evaluateLockRef.current
-      ) {
-        const isHostNow = data.host === playerName;
-        if (isHostNow) handleEvaluate();
       }
 
       if (data.phase !== "playing") {

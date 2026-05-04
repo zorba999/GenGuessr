@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { CheckCircle, Clock, MapPin, Globe } from "lucide-react";
 import type { RoomState, ArticleContent } from "@/lib/types";
 
-const ROUND_DURATION = 90;
+const ROUND_DURATION = 60;
 
 interface Props {
   roomState: RoomState;
