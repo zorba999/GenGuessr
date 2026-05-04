@@ -27,17 +27,36 @@ export default function RoomPage() {
   const prevPhaseRef = useRef<string | null>(null);
   const prevRoundRef = useRef<number | null>(null);
   const articleContentRef = useRef<ArticleContent | null>(null);
+  const isPollingRef = useRef(false);
+  const isFetchingArticleRef = useRef(false);
 
   useEffect(() => {
     const host = localStorage.getItem("isHost") === "true";
     setIsHost(host);
   }, []);
 
+  const loadArticle = useCallback(async () => {
+    if (isFetchingArticleRef.current) return;
+    isFetchingArticleRef.current = true;
+    try {
+      const artRes = await fetch(`/api/article/${roomId}`);
+      if (artRes.ok) {
+        const artData: ArticleContent = await artRes.json();
+        setArticleContent(artData);
+        articleContentRef.current = artData;
+      }
+    } finally {
+      isFetchingArticleRef.current = false;
+    }
+  }, [roomId]);
+
   const fetchRoomState = useCallback(async () => {
+    if (isPollingRef.current) return;
+    isPollingRef.current = true;
     try {
       const res = await fetch(`/api/room/${roomId}`);
-      if (res.status === 404) return;
-      if (!res.ok) return;
+      if (res.status === 404) { isPollingRef.current = false; return; }
+      if (!res.ok) { isPollingRef.current = false; return; }
       const data: RoomState = await res.json();
       setRoomState(data);
 
@@ -47,15 +66,11 @@ export default function RoomPage() {
       if (data.phase === "playing") {
         if (phaseChanged || roundChanged) {
           setGuessSubmitted(false);
-          setArticleContent(null);
         }
-        if (phaseChanged || roundChanged || !articleContentRef.current) {
-          const artRes = await fetch(`/api/article/${roomId}`);
-          if (artRes.ok) {
-            const artData: ArticleContent = await artRes.json();
-            setArticleContent(artData);
-            articleContentRef.current = artData;
-          }
+        if ((phaseChanged || roundChanged) && !articleContentRef.current) {
+          loadArticle();
+        } else if (!articleContentRef.current && !isFetchingArticleRef.current) {
+          loadArticle();
         }
       }
 
@@ -65,25 +80,30 @@ export default function RoomPage() {
         if (resRes.ok) {
           const resData: RoundResultsData = await resRes.json();
           setRoundResults(resData);
-          if (resData.results.length > 0 && Object.keys(data.total_scores ?? {}).length === 0) {
+          if (resData.results.length > 0) {
             const newTotals: Record<string, number> = { ...data.total_scores };
             resData.results.forEach((r) => {
               newTotals[r.player] = (newTotals[r.player] ?? 0) + r.total_score;
             });
-            setRoomState({ ...data, total_scores: newTotals });
+            if (JSON.stringify(newTotals) !== JSON.stringify(data.total_scores)) {
+              setRoomState({ ...data, total_scores: newTotals });
+            }
           }
         }
       }
 
       if (data.phase !== "playing") {
         articleContentRef.current = null;
+        isFetchingArticleRef.current = false;
       }
       prevPhaseRef.current = data.phase;
       prevRoundRef.current = data.current_round;
     } catch (e) {
       console.error("[fetchRoomState]", e);
+    } finally {
+      isPollingRef.current = false;
     }
-  }, [roomId]);
+  }, [roomId, loadArticle]);
 
   useEffect(() => {
     fetchRoomState();
@@ -102,14 +122,12 @@ export default function RoomPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        if (data.room) setRoomState(data.room);
-        const artRes = await fetch(`/api/article/${roomId}`);
-        if (artRes.ok) {
-          const artData: ArticleContent = await artRes.json();
-          setArticleContent(artData);
-          articleContentRef.current = artData;
+        if (data.room) {
+          setRoomState(data.room);
           prevPhaseRef.current = "playing";
+          prevRoundRef.current = data.room.current_round;
         }
+        loadArticle();
       } else {
         const data = await res.json();
         setError(data.error);
@@ -164,20 +182,16 @@ export default function RoomPage() {
       if (res.ok) {
         const data = await res.json();
         if (data.room) {
-          setRoomState(data.room);
+          articleContentRef.current = null;
+          isFetchingArticleRef.current = false;
+          setArticleContent(null);
+          setRoundResults(null);
+          setGuessSubmitted(false);
           prevPhaseRef.current = data.room.phase;
           prevRoundRef.current = data.room.current_round;
-          setRoundResults(null);
-          articleContentRef.current = null;
+          setRoomState(data.room);
           if (data.room.phase === "playing") {
-            setGuessSubmitted(false);
-            setArticleContent(null);
-            const artRes = await fetch(`/api/article/${roomId}`);
-            if (artRes.ok) {
-              const artData: ArticleContent = await artRes.json();
-              setArticleContent(artData);
-              articleContentRef.current = artData;
-            }
+            loadArticle();
           }
         }
       } else {
