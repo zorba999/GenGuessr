@@ -22,19 +22,23 @@ export async function POST(req: NextRequest) {
       console.warn(`[evaluate] round mismatch: client=${clientRound} server=${room.current_round}, using client`);
     }
 
-    const articleIndices = room.article_indices?.length >= (roundNum + 1)
-      ? room.article_indices
-      : (await import("@/lib/articles")).selectArticles((await import("@/lib/articles")).generateArticleSeed());
+    let article: { country: string; language: string; year: number };
 
-    const articleIdx = articleIndices[roundNum];
-    if (articleIdx === undefined) {
-      return NextResponse.json({ error: `No article for round ${roundNum}` }, { status: 400 });
+    if (room.wiki_articles && room.wiki_articles.length > roundNum) {
+      article = room.wiki_articles[roundNum];
+    } else {
+      const articleIndices = room.article_indices?.length >= (roundNum + 1)
+        ? room.article_indices
+        : (await import("@/lib/articles")).selectArticles((await import("@/lib/articles")).generateArticleSeed());
+      const articleIdx = articleIndices[roundNum];
+      if (articleIdx === undefined) {
+        return NextResponse.json({ error: `No article for round ${roundNum}` }, { status: 400 });
+      }
+      article = ARTICLES[articleIdx];
     }
-    const article = ARTICLES[articleIdx];
 
     updateRoom(roomId, {
       phase: "round_results",
-      last_round_article_id: articleIdx,
     });
 
     const offChainGuesses = getRoundGuesses(roomId, roundNum);
@@ -57,7 +61,6 @@ export async function POST(req: NextRequest) {
         });
         updateRoom(roomId, {
           phase: "round_results",
-          last_round_article_id: articleIdx,
           total_scores: newTotals,
           [`round_${roundNum}_scores`]: localScores,
         } as any);

@@ -1,4 +1,5 @@
 import { selectArticles, generateArticleSeed } from "./articles";
+import { fetchGameArticles } from "./wikiArticles";
 import type { GamePhase, RoomState } from "./types";
 import fs from "fs";
 import path from "path";
@@ -40,7 +41,7 @@ function getStore(): Map<string, RoomState> {
   return global.__roomStore;
 }
 
-export function createRoom(roomId: string, hostName: string): RoomState {
+export async function createRoom(roomId: string, hostName: string): Promise<RoomState> {
   const room: RoomState = {
     room_id: roomId,
     host: hostName,
@@ -54,6 +55,18 @@ export function createRoom(roomId: string, hostName: string): RoomState {
   const store = getStore();
   store.set(roomId, room);
   saveToDisk(store);
+
+  fetchGameArticles().then((articles) => {
+    if (articles.length === TOTAL_ROUNDS) {
+      const updated = { ...getRoom(roomId)!, wiki_articles: articles };
+      store.set(roomId, updated);
+      saveToDisk(store);
+      console.log(`[roomStore] Wikipedia articles ready for room ${roomId}`);
+    } else {
+      console.warn(`[roomStore] Only got ${articles.length} wiki articles for ${roomId}, using fallback`);
+    }
+  }).catch((e) => console.error("[roomStore] fetchGameArticles failed:", e));
+
   return room;
 }
 

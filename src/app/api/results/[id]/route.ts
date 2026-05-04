@@ -40,18 +40,24 @@ export async function GET(
 
     const room = getRoom(id);
     if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    const indices = room.article_indices?.length
-      ? room.article_indices
-      : (await import("@/lib/articles")).selectArticles(id);
-    const articleIdx = indices[roundNum];
-    const { ARTICLES } = await import("@/lib/articles");
-    const article = ARTICLES[articleIdx] ?? ARTICLES[0];
+
+    let articleActual: { country: string; language: string; year: number };
+    if (room.wiki_articles && room.wiki_articles.length > roundNum) {
+      articleActual = room.wiki_articles[roundNum];
+    } else {
+      const indices = room.article_indices?.length
+        ? room.article_indices
+        : (await import("@/lib/articles")).selectArticles(id);
+      const articleIdx = indices[roundNum];
+      const { ARTICLES } = await import("@/lib/articles");
+      articleActual = ARTICLES[articleIdx] ?? ARTICLES[0];
+    }
 
     const localScores = (room as any)[`round_${roundNum}_scores`] ?? [];
 
     return NextResponse.json({
       results: localScores,
-      actual: { country: article.country, language: article.language, year: article.year },
+      actual: { country: articleActual.country, language: articleActual.language, year: articleActual.year },
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);

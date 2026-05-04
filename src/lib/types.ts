@@ -16,6 +16,7 @@ export interface RoomState {
   total_scores: Record<string, number>;
   last_round_scores?: Record<string, number>;
   last_round_article_id?: number;
+  wiki_articles?: { content: string; country: string; language: string; year: number }[];
 }
 
 export interface ArticleContent {

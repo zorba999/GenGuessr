@@ -14,6 +14,16 @@ export async function GET(
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
     const roundIdx = room.current_round ?? 0;
+
+    if (room.wiki_articles && room.wiki_articles.length > roundIdx) {
+      const article = room.wiki_articles[roundIdx];
+      return NextResponse.json({
+        content: article.content,
+        round: roundIdx + 1,
+        total_rounds: room.total_rounds,
+      });
+    }
+
     let articleIndices = room.article_indices;
     const TOTAL_ROUNDS = 5;
     if (!articleIndices || articleIndices.length < TOTAL_ROUNDS ||
