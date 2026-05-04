@@ -11,7 +11,10 @@ export async function POST(req: NextRequest) {
     }
 
     const room = getRoom(roomId);
-    if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    if (!room) {
+      console.error(`[evaluate] Room not found: "${roomId}"`);
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    }
 
     const roundNum = clientRound ?? room.current_round;
 

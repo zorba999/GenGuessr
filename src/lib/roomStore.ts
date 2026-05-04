@@ -28,7 +28,9 @@ function saveToDisk(store: Map<string, RoomState>) {
     const obj: Record<string, RoomState> = {};
     store.forEach((v, k) => { obj[k] = v; });
     fs.writeFileSync(PERSIST_FILE, JSON.stringify(obj), "utf-8");
-  } catch {}
+  } catch (e) {
+    console.error("[roomStore] saveToDisk failed:", e);
+  }
 }
 
 function getStore(): Map<string, RoomState> {
@@ -56,7 +58,13 @@ export function createRoom(roomId: string, hostName: string): RoomState {
 }
 
 export function getRoom(roomId: string): RoomState | null {
-  return getStore().get(roomId) ?? null;
+  const store = getStore();
+  if (!store.has(roomId) && store.size === 0) {
+    const reloaded = loadFromDisk();
+    reloaded.forEach((v, k) => store.set(k, v));
+    console.warn(`[roomStore] store was empty, reloaded ${store.size} rooms from disk`);
+  }
+  return store.get(roomId) ?? null;
 }
 
 export function joinRoom(roomId: string, playerName: string): RoomState | null {
