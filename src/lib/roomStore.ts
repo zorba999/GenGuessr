@@ -71,16 +71,13 @@ async function loadFromBlob(roomId: string): Promise<RoomState | null> {
 }
 
 export async function ensureRoom(roomId: string): Promise<void> {
+  const blobRoom = await loadFromBlob(roomId);
   const store = getStore();
-  if (store.has(roomId)) return;
-  const room = await loadFromBlob(roomId);
-  if (room) {
-    store.set(roomId, room);
-    console.log(`[roomStore] restored room ${roomId} from Blobs`);
-  } else if (store.size === 0) {
+  if (blobRoom) {
+    store.set(roomId, blobRoom);
+  } else if (!store.has(roomId)) {
     const reloaded = loadFromDisk();
     reloaded.forEach((v, k) => store.set(k, v));
-    if (store.size > 0) console.log(`[roomStore] restored ${store.size} rooms from disk`);
   }
 }
 
